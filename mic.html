@@ -7,6 +7,7 @@
   <body>
 <div id="pad" style="text-align: center;"></div>
 <div style="text-align: right;" id="form">
+	<span id="status">???</span><br />
 	<label>min: <input id="min" type="number" value="0" /></label>
 	<label>max: <input id="max" type="number" value="22050" /></label>
 	<label>bins: <input id="bins" type="number" value="128" onchange="if (String(this.value.length) > 0) new_bin_number = this.value;" /></label>
@@ -68,9 +69,14 @@
 		for (var i = 0; i < 22050; i += 500) {
 			draw.text(i, draw.width - width_cut + 35, -y_above_canvas + (full_spectrum_height) * (22050 - i) / 22050)
 		}
-		if (!fft) return;
+		if (!fft) {
+			document.querySelector('#status').textContent = "No fft object.";
+			return;
+		}
 		var spectrum = fft.analyze(bin_number);
+		document.querySelector('#status').textContent = "Analysis spectrum was empty";
 		if (!spectrum.length) return;
+		document.querySelector('#status').textContent = `spectrum.length = ${spectrum.length}`;
 		samples.push(spectrum);
 		if (samples.length > samples_to_store) samples.shift();
 		for (var i = 0; i < samples.length; i++) {
