@@ -1,0 +1,182 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>exposure camera</title>
+</head>
+  <body>
+<div id="pad" style="text-align: center;"></div>
+<div style="text-align: right;" id="form">
+	<span id="status">???</span><br />
+	<button class="adjustment" onclick="capture_new.save('exposure-capture-' + Date.now() + '.png');">save</button>
+	<label>width: <input id="width" type="number" value="1920" /></label>
+	<label>height: <input id="height" type="number" value="1080" /></label>
+	<button
+		onclick="capture = draw.createCapture({video: { deviceId: { exact: document.querySelector('#camera').value }, width: { ideal: document.querySelector('#width').value }, height: { ideal: document.querySelector('#height').value } }, audio: false }, function (s) {stream = s; newStream(stream); }); loadDevices(); capture.hide();">Camera
+		View</button>
+	<button onclick="loadDevices();">load devices</button>
+	<label>camera select <select id="camera"></select></label>
+	<label>
+		<input type="checkbox" onchange="options.grayscale = this.checked;" />
+		Grayscale
+	</label><br />
+	<button class="adjustment"
+		onclick="options.exposure = Math.max(1, options.exposure - 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">--</button>
+	<button class="adjustment"
+		onclick="options.exposure = Math.max(1, options.exposure - 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">-
+	</button>
+	Exposure: x<span id="exposure">1</span>
+	<button class="adjustment"
+		onclick="options.exposure = Math.max(1, options.exposure + 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">+</button>
+	<button class="adjustment"
+		onclick="options.exposure = Math.max(1, options.exposure + 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">++</button><br />
+
+	<button class="adjustment"
+		onclick="options.zoom = options.min_zoom; document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">RST</button>
+	<span>(max lens zoom: <span id="max_zoom">1</span>)</span>
+	<button class="adjustment"
+		onclick="options.zoom = Math.max(options.min_zoom, options.zoom - 1); document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">--</button>
+	<button class="adjustment"
+		onclick="options.zoom = Math.max(options.min_zoom, options.zoom - 0.1); document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">-</button>
+	Zoom: x<span id="zoom">1</span>
+	<button class="adjustment"
+		onclick="options.zoom = Math.max(options.min_zoom, options.zoom + 0.1); document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">+</button>
+	<button class="adjustment"
+		onclick="options.zoom = Math.max(options.min_zoom, options.zoom + 1); document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">++</button>
+	<br />
+
+</div>
+<script src="p5-1.11.3.min.js"></script>
+<script>
+	function loadDevices() {
+		navigator.mediaDevices.enumerateDevices().then(function (devices) {
+			document.querySelector('select#camera').innerHTML = '';
+			for (var i = 0; i < devices.length; i++) {
+				var device = devices[i];
+				if (device.kind === 'videoinput') {
+					var option = document.createElement('option');
+					option.value = device.deviceId;
+					console.log(device);
+					option.text = device.label || device.deviceId || 'camera ' + (i + 1);
+					document.querySelector('select#camera').appendChild(option);
+				}
+			};
+		});
+	}
+	loadDevices();
+	function update() {
+		draw.clear();
+		if (!capture || !capture.width || !capture.height) return;
+		options.p5_zoom = Math.max(1, options.zoom / options.max_zoom);
+		constraints.zoom = Math.min(options.max_zoom, options.zoom);
+		if (track) {
+			track.applyConstraints(constraints);
+		}
+		capture_new = capture.get(capture.width / 2 * (1 - 1 / options.p5_zoom),
+			capture.height / 2 * (1 - 1 / options.p5_zoom),
+			capture.width / options.p5_zoom,
+			capture.height / options.p5_zoom);
+		document.getElementById('status').textContent = `Capture ${Math.round(capture.width)}x${Math.round(capture.height)} (zoomed ${Math.round(capture_new.width)}x${Math.round(capture_new.height)})`;
+		if (capture_new.width / capture_new.height > innerWidth / (innerHeight - bar_height)) {
+			var scale = innerWidth / capture_new.width;
+		} else {
+			var scale = (innerHeight - bar_height) / capture_new.height;
+		}
+
+		capture_new.loadPixels();
+		for (var i = 0; i < capture_new.pixels.length; i += 4) {
+			if (!options.grayscale && options.exposure == 1) break;
+			var pixels = [capture_new.pixels[i], capture_new.pixels[i + 1], capture_new.pixels[i + 2]];
+			if (options.grayscale) {
+				var gray = pixels[0] * 0.2126 + pixels[1] * 0.7152 + pixels[2] * 0.0722;
+				pixels[0] = gray;
+				pixels[1] = gray;
+				pixels[2] = gray;
+			}
+			for (var j = 0; j < 3; j++) pixels[j] *= options.exposure;
+			capture_new.pixels[i + 0] = Math.min(255, pixels[0]);
+			capture_new.pixels[i + 1] = Math.min(255, pixels[1]);
+			capture_new.pixels[i + 2] = Math.min(255, pixels[2]);
+		}
+		capture_new.updatePixels();
+		draw.image(capture_new, (draw.width - capture_new.width * scale) / 2, (draw.height - capture_new.height * scale) / 2, capture_new.width * scale, capture_new.height * scale);
+	}
+	var s = function (sketch) {
+		sketch.setup = async function () {
+			sketch.createCanvas(innerWidth, innerHeight);
+			draw.angleMode('degrees');
+			draw.frameRate(30);
+			draw.strokeCap('square');
+			draw.textAlign('center', 'center');
+			capture = draw.createCapture({ video: { facingMode: 'environment', width: { ideal: document.querySelector('#width').value }, height: { ideal: document.querySelector('#height').value } }, audio: false }, function (s) {
+				stream = s;
+				newStream(stream);
+			});
+			capture_new = null;
+			resize(null);
+		};
+		sketch.draw = update;
+	}
+
+	var bar_height = 20;
+	var draw = new p5(s, 'pad');
+	var stream = null;
+	var track = null;
+	var form = document.querySelector('#form');
+	var options = {
+		exposure: 1,
+		grayscale: 0,
+		zoom: 1,
+		max_zoom: 1,
+		min_zoom: 1,
+		p5_zoom: 1
+	};
+	var constraints = {
+		width: { ideal: document.querySelector('#width').value },
+		height: { ideal: document.querySelector('#height').value },
+		zoom: 1
+	};
+	function newStream(stream) {
+		var video = stream.getVideoTracks()[0];
+		track = video;
+		const capabilities = video.getCapabilities();
+		if ('zoom' in capabilities) {
+			var min = capabilities["zoom"]["min"];
+			var max = capabilities["zoom"]["max"];
+			options.max_zoom = max;
+			options.min_zoom = min;
+		} else {
+			options.max_zoom = 1;
+			options.min_zoom = 1;
+		}
+		document.querySelector('#max_zoom').textContent = options.max_zoom;
+		if (options.zoom < options.min_zoom) options.zoom = options.min_zoom;
+	}
+	resize = function (ev) {
+		bar_height = innerHeight - (form.getBoundingClientRect().y);
+		draw.resizeCanvas(innerWidth, innerHeight); // - bar_height);
+	};
+	onerror = function(error) {
+		var message = `${error.name}: ${error.message}`;
+		alert(message);
+	};
+	//onresize = resize;
+</script>
+<style>
+	video {
+		display: none;
+	}
+
+	body,
+	html {
+		padding: 0;
+		margin: 0;
+	}
+
+	button.adjustment {
+		font-size: 25px;
+	}
+</style>
+</body>
+
+</html>
