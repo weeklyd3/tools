@@ -11,7 +11,7 @@
 	<label>max: <input id="max" type="number" value="22050" /></label>
 	<label>bins: <input id="bins" type="number" value="128" onchange="if (String(this.value.length) > 0) new_bin_number = this.value;" /></label>
 	<button
-		onclick="capture = draw.createCapture({ video: false, audio: true }, function (s) {stream = s; newStream(stream); }); loadDevices(); capture.hide();">Audio
+		onclick="capture = draw.createCapture({ video: false, audio: { deviceId: { exact: document.querySelector('#camera').value } } }, function (s) {stream = s; newStream(stream); }); loadDevices(); capture.hide();">Audio
 		View</button>
 	<button onclick="loadDevices();">load devices</button>
 	<label>mic select <select id="camera"></select></label>
