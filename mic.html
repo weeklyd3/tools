@@ -76,7 +76,10 @@
 		var spectrum = fft.analyze(bin_number);
 		document.querySelector('#status').textContent = "Analysis spectrum was empty";
 		if (!spectrum.length) return;
-		document.querySelector('#status').textContent = `spectrum.length = ${spectrum.length}`;
+		var total = 0;
+		for (const value of spectrum) total += value;
+		var average = total / spectrum.length;
+		document.querySelector('#status').textContent = `spectrum.length = ${spectrum.length}, average = ${Math.round(average * 1000) / 1000}, max ${Math.max(...spectrum)}, min ${Math.min(...spectrum)}`;
 		samples.push(spectrum);
 		if (samples.length > samples_to_store) samples.shift();
 		for (var i = 0; i < samples.length; i++) {
