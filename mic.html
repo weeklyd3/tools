@@ -12,7 +12,7 @@
 	<label>max: <input id="max" type="number" value="22050" /></label>
 	<label>bins: <input id="bins" type="number" value="128" onchange="if (String(this.value.length) > 0) new_bin_number = this.value;" /></label>
 	<button
-		onclick="capture = draw.createCapture({ video: false, audio: { deviceId: { exact: document.querySelector('#camera').value } } }, function (s) {stream = s; newStream(stream); }); loadDevices(); capture.hide();">Audio
+		onclick="navigator.mediaDevices.getUserMedia({ audio: {echoCancellation:false, deviceId: { exact: document.querySelector('#camera').value }} }).then(function(s) { stream = s; newStream(stream); });">Audio
 		View</button>
 	<button onclick="loadDevices();">load devices</button>
 	<label>mic select <select id="camera"></select></label>
@@ -69,11 +69,12 @@
 		for (var i = 0; i < 22050; i += 500) {
 			draw.text(i, draw.width - width_cut + 35, -y_above_canvas + (full_spectrum_height) * (22050 - i) / 22050)
 		}
-		if (!fft) {
+		if (!analyzer) {
 			document.querySelector('#status').textContent = "No fft object.";
 			return;
 		}
-		var spectrum = fft.analyze(bin_number);
+		analyzer.getByteFrequencyData(dataArray);
+		var spectrum = dataArray.slice();
 		document.querySelector('#status').textContent = "Analysis spectrum was empty";
 		if (!spectrum.length) return;
 		var total = 0;
@@ -130,7 +131,7 @@
 			draw.colorMode('hsl');
 			draw.textSize(8);
 			draw.textAlign('center', 'center');
-			capture = draw.createCapture({ video: false, audio: true }, function (s) {
+			navigator.mediaDevices.getUserMedia({ audio: {echoCancellation:false} }).then(function(s) {
 				stream = s;
 				newStream(stream);
 			});
@@ -141,7 +142,6 @@
 	}
 
 	var bar_height = 20;
-	var draw = new p5(s, 'pad');
 	var stream = null;
 	var track = null;
 	var form = document.querySelector('#form');
@@ -153,15 +153,17 @@
 		min_zoom: 1,
 		p5_zoom: 1
 	};
+	var analyzer = null;
+
 	function newStream(stream) {
 		bin_number = new_bin_number;
-		delete fft;
-		fft = new p5.FFT(0.8, bin_number);
-		var video = stream.getAudioTracks()[0];
-		track = video;
-		track.muted = true;
-		console.log(capture);
-		fft.setInput(capture);
+		audioCtx = new AudioContext();
+		analyzer = audioCtx.createAnalyser();
+		source = audioCtx.createMediaStreamSource(stream);
+		source.connect(analyzer);
+		analyzer.fftSize = bin_number;
+		bufferLength = analyzer.frequencyBinCount;
+		dataArray = new Uint8Array(bufferLength);
 		return;
 	}
 	resize = function (ev) {
@@ -173,6 +175,8 @@
 		alert(message);
 	};
 	//onresize = resize;
+
+	var draw = new p5(s, 'pad');
 </script>
 <style>
 	video {
