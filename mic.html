@@ -29,9 +29,9 @@
 	<button class="adjustment"
 		onclick="options.exposure = Math.max(1, options.exposure + 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">+</button>
 	<button class="adjustment"
-		onclick="options.exposure = Math.max(1, options.exposure + 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">++</button><br />
+		onclick="options.exposure = Math.max(1, options.exposure + 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">++</button><!--<br />
 	Have headphones? <button onclick="paused = true;">Play</button> <button onclick="paused = false;">Stop</button><br />
-	<label>Volume gain <span id="gain_value">1</span>: <br /><input style="width:95%;" type="range" min="0" max="10" value="1" step="0.01" oninput="gain_input = this.value; document.querySelector('#gain_value').textContent = this.value;" /></label>
+	<label>Volume gain <span id="gain_value">1</span>: <br /><input style="width:95%;" type="range" min="0" max="10" value="1" step="0.01" oninput="gain_input = this.value; document.querySelector('#gain_value').textContent = this.value;" /></label>-->
 
 </div>
 <script src="p5-1.11.3.min.js"></script>
@@ -59,8 +59,8 @@
 	var samples_to_store = 75;
 	var samples = [];
 	function update() {
-		if (paused) gain.gain.value = 0;
-		else gain.gain.value = gain_input;
+		//if (paused) gain.gain.value = 0;
+		//else gain.gain.value = gain_input;
 		if (options.grayscale) draw.colorMode('rgb');
 		else draw.colorMode('hsb');
 		draw.clear();
@@ -162,12 +162,12 @@
 	const audioCtx = new AudioContext();
 	var paused = true;
 	
-	const gain = audioCtx.createGain();
-	gain.gain.value = 2.0;
+	//const gain = audioCtx.createGain();
+	//gain.gain.value = 2.0;
 	
-	gain.connect(audioCtx.destination);
+	//gain.connect(audioCtx.destination);
 	var track;
-	gain.gain.value = 0;
+	//gain.gain.value = 0;
 	var gain_input = 1;
 
 	function newStream(stream) {
@@ -178,7 +178,7 @@
 		analyzer.fftSize = bin_number;
 		bufferLength = analyzer.frequencyBinCount;
 		dataArray = new Uint8Array(bufferLength);
-		source.connect(gain);
+		//source.connect(gain);
 		return;
 	}
 	resize = function (ev) {
