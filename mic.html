@@ -12,7 +12,7 @@
 	<label>max: <input id="max" type="number" value="22050" /></label>
 	<label>bins: <input id="bins" type="number" value="128" onchange="if (String(this.value.length) > 0) new_bin_number = this.value;" /></label>
 	<button
-		onclick="navigator.mediaDevices.getUserMedia({ audio: {echoCancellation:false, deviceId: { exact: document.querySelector('#camera').value }} }).then(function(s) { stream = s; newStream(stream); });">Audio
+		onclick="media = navigator.mediaDevices.getUserMedia({ audio: {echoCancellation:false, deviceId: { exact: document.querySelector('#camera').value }} }).then(function(s) { stream = s; newStream(stream); });">Audio
 		View</button>
 	<button onclick="loadDevices();">load devices</button>
 	<label>mic select <select id="camera"></select></label>
@@ -30,6 +30,8 @@
 		onclick="options.exposure = Math.max(1, options.exposure + 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">+</button>
 	<button class="adjustment"
 		onclick="options.exposure = Math.max(1, options.exposure + 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">++</button><br />
+	Have headphones? <button onclick="audio.play()">Play back</button> <button onclick="audio.pause()">Stop playing</button><br />
+	<label>Volume gain <span id="gain_value">1</span>: <br /><input style="width:95%;" type="range" min="0" max="10" value="1" step="0.01" oninput="gain.gain.value = this.value; document.querySelector('#gain_value').textContent = this.value;" /></label>
 
 </div>
 <script src="p5-1.11.3.min.js"></script>
@@ -131,7 +133,7 @@
 			draw.colorMode('hsl');
 			draw.textSize(8);
 			draw.textAlign('center', 'center');
-			navigator.mediaDevices.getUserMedia({ audio: {echoCancellation:false} }).then(function(s) {
+			media = navigator.mediaDevices.getUserMedia({ audio: {echoCancellation:false} }).then(function(s) {
 				stream = s;
 				newStream(stream);
 			});
@@ -154,16 +156,25 @@
 		p5_zoom: 1
 	};
 	var analyzer = null;
+	var media;
+	var audio = new Audio();
+	var audioCtx = new AudioContext();
+	var gain = new GainNode(audioCtx);
+	var track;
+	gain.gain.value = 1;
 
 	function newStream(stream) {
 		bin_number = new_bin_number;
-		audioCtx = new AudioContext();
 		analyzer = audioCtx.createAnalyser();
 		source = audioCtx.createMediaStreamSource(stream);
 		source.connect(analyzer);
 		analyzer.fftSize = bin_number;
 		bufferLength = analyzer.frequencyBinCount;
 		dataArray = new Uint8Array(bufferLength);
+		audio.srcObject = stream;
+		track = audioCtx.createMediaElementSource(audio);
+		track.connect(gain);
+		gain.connect(audioCtx.destination);
 		return;
 	}
 	resize = function (ev) {
