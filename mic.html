@@ -30,7 +30,7 @@
 		onclick="options.exposure = Math.max(1, options.exposure + 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">+</button>
 	<button class="adjustment"
 		onclick="options.exposure = Math.max(1, options.exposure + 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">++</button><br />
-	Have headphones? <button onclick="audio.play()">Play back</button> <button onclick="audio.pause()">Stop playing</button><br />
+	Have headphones? <button onclick="if (audioCtx.state === 'suspended') {audioCtx.resume().then(() => alert('AudioContext resumed')); } audio.play();">Play back</button> <button onclick="audio.pause()">Stop playing</button><br />
 	<label>Volume gain <span id="gain_value">1</span>: <br /><input style="width:95%;" type="range" min="0" max="10" value="1" step="0.01" oninput="gain.gain.value = this.value; document.querySelector('#gain_value').textContent = this.value;" /></label>
 
 </div>
