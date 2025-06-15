@@ -158,6 +158,8 @@
 	var analyzer = null;
 	var media;
 	var audio = new Audio();
+	document.body.appendChild(audio);
+	audio.controls = true;
 	var audioCtx = new AudioContext();
 	var gain = new GainNode(audioCtx);
 	var track;
