@@ -9,8 +9,8 @@
 <div style="text-align: right;" id="form">
 	<span id="status">???</span><br />
 	<button class="adjustment" onclick="capture_new.save('exposure-capture-' + Date.now() + '.png');">save</button>
-	<label>width: <input id="width" type="number" value="1920" /></label>
-	<label>height: <input id="height" type="number" value="1080" /></label>
+	<label>width: <input id="width" type="number" value="640" /></label>
+	<label>height: <input id="height" type="number" value="480" /></label>
 	<button
 		onclick="capture = draw.createCapture({video: { deviceId: { exact: document.querySelector('#camera').value }, width: { ideal: document.querySelector('#width').value }, height: { ideal: document.querySelector('#height').value } }, audio: false }, function (s) {stream = s; newStream(stream); }); loadDevices(); capture.hide();">Camera
 		View</button>

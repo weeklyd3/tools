@@ -1,0 +1,252 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>spectrogram</title>
+</head>
+
+<body>
+	<div id="pad" style="text-align: center;"></div>
+	<div style="text-align: right;" id="form">
+		Don't have a keyboard? Hate yourself? <button onclick="document.getElementById('keyboard').focus()">bring up on screen keyboard</button>
+	</div>
+	<textarea style="position:absolute;top:-1000px;" id="keyboard"></textarea>
+	<script src="p5-1.11.3.min.js"></script>
+	<script>
+		function update() {
+			draw.clear();
+			draw.push();
+			var width = innerWidth;
+			var height = innerHeight / 2;
+			draw.translate(width / 2, height / 3);
+			drawKeyboard(notes[0], width, height / 3);
+			draw.translate(0, height / 2);
+			drawKeyboard(notes[1], width, height / 3);
+			draw.pop();
+		}
+		function drawKeyboard(keys, width, height) {
+			draw.push();
+			var white_keys = 0;
+			for (const key of keys) {
+				if (key.note.indexOf('is') == -1) white_keys++;
+			}
+			var key_width = width * 0.9 / white_keys;
+			var white_key_index = 0;
+			draw.fill('white');
+			draw.stroke('black');
+			draw.strokeWeight(2);
+			for (const key of keys) {
+				var x = -key_width * (white_keys / 2 - white_key_index);
+				if (key.note.indexOf('is') == -1) {
+					draw.fill('white');
+					if (fundamentals[key.key]) draw.fill('red');
+					draw.rect(x, -height / 2, key_width, height);
+				} else {
+					//draw.fill('black');
+					//draw.rect(x - key_width / 4, -height / 2, key_width / 2, height * 0.6);
+				}
+
+				if (key.note.indexOf('is') == -1) white_key_index++;
+			}
+			var white_key_index = 0;
+			for (const key of keys) {
+				var x = -key_width * (white_keys / 2 - white_key_index);
+				if (key.note.indexOf('is') == -1) {
+					//draw.fill(draw.color(0, 0, 0, 0));
+					//draw.rect(x, -height / 2, key_width, height);
+				} else {
+					draw.fill('black');
+					if (fundamentals[key.key]) draw.fill('red');
+					draw.rect(x - key_width / 3, -height / 2, key_width / 1.5, height * 0.6);
+				}
+				if (key.note.indexOf('is') == -1) white_key_index++;
+			}
+			var white_key_index = 0;
+			draw.strokeWeight(0);
+			for (const key of keys) {
+				draw.fill('white');
+				var x = -key_width * (white_keys / 2 - white_key_index);
+				if (key.note.indexOf('is') == -1) white_key_index++;
+				if (key.note.indexOf('is') == -1) draw.fill('black');
+				var textX = (key.note.indexOf('is') == -1) ? (x + key_width / 2) : (x);
+				var textY = (key.note.indexOf('is') == -1) ? (height * 0.4) : (-height * 0.4);
+				draw.text(key.note + "\n" + key.key, textX, textY);
+			}
+			draw.pop();
+		}
+		var notes = [
+			// first row
+			[
+				{ "key": "Backquote", "note": "Gis3" },
+				{ "key": "Tab", "note": "A3" },
+				{ "key": "Digit1", "note": "Ais3" },
+				{ "key": "KeyQ", "note": "B3" },
+				{ "key": "KeyW", "note": "C4" },
+				{ "key": "Digit3", "note": "Cis4" },
+				{ "key": "KeyE", "note": "D4" },
+				{ "key": "Digit4", "note": "Dis4" },
+				{ "key": "KeyR", "note": "E4" },
+				{ "key": "KeyT", "note": "F4" },
+				{ "key": "Digit6", "note": "Fis4" },
+				{ "key": "KeyY", "note": "G4" },
+				{ "key": "Digit7", "note": "Gis4" },
+				{ "key": "KeyU", "note": "A4" },
+				{ "key": "Digit8", "note": "Ais4" },
+				{ "key": "KeyI", "note": "B4" },
+				{ "key": "KeyO", "note": "C5" },
+				{ "key": "Digit0", "note": "Cis5" },
+				{ "key": "KeyP", "note": "D5" },
+				{ "key": "Minus", "note": "Dis5" },
+				{ "key": "BracketLeft", "note": "E5" },
+				{ "key": "BracketRight", "note": "F5" },
+				{ "key": "Backspace", "note": "Fis5" },
+				{ "key": "Backslash", "note": "G5" },
+			],
+			// second row
+			[
+				{ "key": "CapsLock", "note": "B1" },
+				{ "key": "ShiftLeft", "note": "C2" },
+				{ "key": "KeyA", "note": "Cis2" },
+				{ "key": "KeyZ", "note": "D2" },
+				{ "key": "KeyS", "note": "Dis2" },
+				{ "key": "KeyX", "note": "E2" },
+				{ "key": "KeyC", "note": "F2" },
+				{ "key": "KeyF", "note": "Fis2" },
+				{ "key": "KeyV", "note": "G2" },
+				{ "key": "KeyG", "note": "Gis2" },
+				{ "key": "KeyB", "note": "A2" },
+				{ "key": "KeyH", "note": "Ais2" },
+				{ "key": "KeyN", "note": "B2" },
+				{ "key": "KeyM", "note": "C3" },
+				{ "key": "KeyK", "note": "Cis3" },
+				{ "key": "Comma", "note": "D3" },
+				{ "key": "KeyL", "note": "Dis3" },
+				{ "key": "Period", "note": "E3" },
+				{ "key": "Slash", "note": "F3" },
+				{ "key": "Quote", "note": "Fis3" },
+				{ "key": "ShiftRight", "note": "G3" },
+				{ "key": "Enter", "note": "Gis3" }
+			]
+		];
+		for (const array of notes) {
+			for (const note of array) {
+				note.offset = 0;
+				note.letter = '';
+				note.octave = '';
+				for (const char of note.note) {
+					if ('1234567890'.indexOf(char) != -1) note.octave += char;
+					else note.letter += char;
+				}
+				note.number = ["C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "Ais", "B"].indexOf(note.letter);
+				note.frequency = 440 / (2 ** (9 / 12)) * (2 ** (note.octave - 4)) * (2 ** (note.number / 12));
+			}
+		}
+		var fundamentals = {};
+		const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+		function handle(ev) {
+			console.log(ev);
+			var code = ev.code;
+			if (fundamentals[code]) return;
+			for (const array of notes) {
+				for (const note of array) {
+					if (note.key == code) fundamentals[code] = {frequency: note.frequency * 2 ** (options.offset / 12), oscillators: []};
+				}
+			}
+			if (!fundamentals[code]) return console.log(`${code} has no note`);
+			var actual_overtones = [[1, 1], ...overtones];
+			for (const overtone of actual_overtones) {
+				oscillator = audioCtx.createOscillator();
+				oscillator.type = 'sine';
+				oscillator.frequency.setValueAtTime(overtone[0] * fundamentals[code].frequency, audioCtx.currentTime);
+				oscillator.connect(audioCtx.destination);
+				const gain = audioCtx.createGain();
+				gain.gain.setValueAtTime(overtone[1], audioCtx.currentTime); // 50% volume
+				oscillator.connect(gain);
+				gain.connect(audioCtx.destination);
+				oscillator.start();
+				fundamentals[code].oscillators.push(oscillator);
+			}
+		}
+		function handleUp(ev) {
+			var code = ev.code;
+			for (const array of notes) {
+				for (const note of array) {
+					if (note && note.key == code) {
+						if (fundamentals[code].oscillators) {
+							for (const o of fundamentals[code].oscillators) o.stop();
+							//for (const o of fundamentals[code].oscillators) setTimeout(o.stop, 20);
+						}
+						fundamentals[code] = null;
+					}
+				}
+			}
+		}
+		// [frequency multiplier, gain]
+		var overtones = [
+		];
+		for (var i = 2; i <= 10; i++) overtones.push([i, 1 / i]);
+		var keysDown = {};
+		var lastKeysDown = {};
+		onkeydown = function(ev) {
+			ev.preventDefault();
+			keysDown[ev.code] = ev;
+		};
+		onkeyup = function(ev) {
+			ev.preventDefault();
+			keysDown[ev.code] = false;
+		};
+		var dt = 1000 / 250;
+		setInterval(function() {
+			for (const key of Object.keys(keysDown)) {
+				if (keysDown[key] && !lastKeysDown[key]) handle(keysDown[key]);
+				if (!keysDown[key] && lastKeysDown[key]) handleUp(lastKeysDown[key]);
+			}
+			lastKeysDown = {...keysDown};
+		}, dt);
+		var s = function (sketch) {
+			sketch.setup = async function () {
+				sketch.createCanvas(innerWidth, innerHeight / 2);
+				draw.angleMode('degrees');
+				draw.frameRate(30);
+				draw.strokeCap('square');
+				draw.colorMode('hsl');
+				draw.textSize(8);
+				draw.textAlign('center', 'center');
+				capture_new = null;
+				resize(null);
+			};
+			sketch.draw = update;
+		}
+		var options = {
+			offset: 0
+		};
+		resize = function (ev) {
+			bar_height = innerHeight;
+			draw.resizeCanvas(innerWidth, innerHeight / 2); // - bar_height);
+		};
+		onerror = function (error) {
+			var message = `${error}`;
+			alert(message);
+		};
+		//onresize = resize;
+
+		var draw = new p5(s, 'pad');
+	</script>
+	<style>
+		video {
+			display: none;
+		}
+
+		body,
+		html {
+			padding: 0;
+			margin: 0;
+		}
+
+		button.adjustment {
+			font-size: 25px;
+		}
+	</style>
+</body>
+
+</html>
