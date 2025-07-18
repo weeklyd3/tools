@@ -147,7 +147,6 @@
 			if (audioCtx.state === 'suspended') {
 				audioCtx.resume();
 			}
-			console.log(ev);
 			var code = ev.code;
 			if (fundamentals[code] && fundamentals[code].ended) {
 				fundamentals[code].ended = false;
@@ -159,7 +158,7 @@
 					if (note.key == code) fundamentals[code] = {frequency: note.frequency * 2 ** (options.offset / 12), oscillators: [], gain: 0, gainChange: options.defaultGainChange * 2, ended: false};
 				}
 			}
-			if (!fundamentals[code]) return console.log(`${code} has no note`);
+			if (!fundamentals[code]) return;
 			var actual_overtones = [[1, 1], ...overtones];
 			for (const overtone of actual_overtones) {
 				oscillator = audioCtx.createOscillator();
@@ -179,7 +178,6 @@
 			}
 		}
 		function handleUp(ev) {
-			console.log("KEYUP", ev);
 			var code = ev.code;
 			for (const array of notes) {
 				for (const note of array) {
@@ -190,7 +188,6 @@
 						}
 						fundamentals[code].gainChange = -options.defaultGainChange;
 						fundamentals[code].ended = true;
-						console.log(fundamentals[code].ended);
 					}
 				}
 			}
