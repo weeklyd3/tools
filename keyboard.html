@@ -168,7 +168,7 @@
 				oscillator.frequency.setValueAtTime((overtone[0] + (Math.random() - 0.5) * Math.min((overtone[0] - 1) * 0.01, 5 / fundamentals[code].frequency)) * fundamentals[code].frequency, audioCtx.currentTime);
 				//oscillator.connect(audioCtx.destination);
 				const gain = audioCtx.createGain();
-				gain.gain.setValueAtTime(overtone[1], audioCtx.currentTime); // 50% volume
+				gain.gain.setValueAtTime(overtone[1] * options.volume, audioCtx.currentTime); // 50% volume
 				oscillator.connect(gain);
 				gain.connect(audioCtx.destination);
 				oscillator.start();
@@ -256,7 +256,7 @@
 				}
 				for (o of value.oscillators) {
 					//o.gain.gain.setValueAtTime(o.volume * value.gain / 1000, audioCtx.currentTime);
-					o.gain.gain.value = o.volume * value.gain;
+					o.gain.gain.value = o.volume * value.gain * options.volume;
 				}
 			}
 			lastKeysDown = {...keysDown};
@@ -277,7 +277,8 @@
 		}
 		var options = {
 			offset: 0,
-			defaultGainChange: 5
+			defaultGainChange: 5,
+			volume: 0.1
 		};
 		resize = function (ev) {
 			bar_height = innerHeight;
