@@ -97,7 +97,7 @@
 
 		capture_new.loadPixels();
 		for (var i = 0; i < capture_new.pixels.length; i += 4) {
-			if (!options.grayscale && options.exposure == 1) break;
+			if (!options.grayscale && options.exposure == 1 && (options.r && options.g && options.b)) break;
 			var pixels = [capture_new.pixels[i], capture_new.pixels[i + 1], capture_new.pixels[i + 2]];
 			if (!options.r) pixels[0] = 0;
 			if (!options.g) pixels[1] = 0;
