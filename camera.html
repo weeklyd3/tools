@@ -125,7 +125,7 @@
 		}
 		total_average_grayscale /= (3 * 255 * capture_new.pixels.length / 4);
 		if (options.auto_exposure) {
-			var target = Math.min(200, Math.max(1, Math.round(10 * options.auto_exposure_target / total_average_grayscale) / 10));
+			var target = Math.min(200, Math.max(1, options.auto_exposure_target / total_average_grayscale));
 			if ((target - options.exposure) > 1) options.exposure += 1;
 			else if ((target - options.exposure) < -1) options.exposure -= 1;
 			else options.exposure = target;
