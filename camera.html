@@ -57,7 +57,7 @@
 		onclick="options.zoom = Math.max(options.min_zoom, options.zoom + 1); document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">++</button>
 	<br />
 	<label>
-		<input type="checkbox" onchange="options.auto_exposure = this.checked;" />
+		<input type="checkbox" onchange="options.auto_exposure = this.checked; if (!this.checked) options.exposure = Math.round(options.exposure * 10) / 10;" />
 		Auto Exposure (WARNING, MAY CAUSE FLASHING!!!)
 	</label>
 	<label>
@@ -131,7 +131,7 @@
 			var total_average_grayscale_historical = 0;
 			for (const value of historical_exposure_averages) total_average_grayscale_historical += value;
 			total_average_grayscale_historical /= historical_exposure_averages.length;
-			
+
 			var target = Math.min(200, Math.max(1, options.auto_exposure_target / total_average_grayscale_historical));
 			if ((target - options.exposure) > 1) options.exposure += 1;
 			else if ((target - options.exposure) < -1) options.exposure -= 1;
