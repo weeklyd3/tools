@@ -33,15 +33,15 @@
 		B
 	</label><br />
 	<button class="adjustment"
-		onclick="options.exposure = Math.max(1, options.exposure - 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10; options.auto_exposure = false;">--</button>
+		onclick="options.exposure = Math.max(1, options.exposure - 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">--</button>
 	<button class="adjustment"
-		onclick="options.exposure = Math.max(1, options.exposure - 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10; options.auto_exposure = false;">-
+		onclick="options.exposure = Math.max(1, options.exposure - 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">-
 	</button>
 	Exposure: x<span id="exposure">1</span>
 	<button class="adjustment"
-		onclick="options.exposure = Math.max(1, options.exposure + 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10; options.auto_exposure = false;">+</button>
+		onclick="options.exposure = Math.max(1, options.exposure + 0.1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">+</button>
 	<button class="adjustment"
-		onclick="options.exposure = Math.max(1, options.exposure + 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10; options.auto_exposure = false;">++</button><br />
+		onclick="options.exposure = Math.max(1, options.exposure + 1); document.querySelector('#exposure').textContent = Math.round(10 * options.exposure) / 10;">++</button><br />
 
 	<button class="adjustment"
 		onclick="options.zoom = options.min_zoom; document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">RST</button>
@@ -58,7 +58,7 @@
 	<br />
 	<label>
 		<input type="checkbox" onchange="options.auto_exposure = this.checked;" />
-		Auto Exposure
+		Auto Exposure (WARNING, MAY CAUSE FLASHING!!!)
 	</label>
 	<label>
 		<input type="range" min="0" max="1" step="0.01" value="0.5" onchange="options.auto_exposure_target = this.value;" />
@@ -123,9 +123,12 @@
 			capture_new.pixels[i + 2] = Math.min(255, pixels[2]);
 			total_average_grayscale += capture_new.pixels[i + 0] + capture_new.pixels[i + 1] + capture_new.pixels[i + 2];
 		}
-		total_average_grayscale /= (3 * capture_new.pixels.length / 4);
+		total_average_grayscale /= (3 * 255 * capture_new.pixels.length / 4);
 		if (options.auto_exposure) {
-			options.exposure = Math.min(200, Math.max(1, Math.round(10 * options.auto_exposure_target / total_average_grayscale) / 10));
+			var target = Math.min(200, Math.max(1, Math.round(10 * options.auto_exposure_target / total_average_grayscale) / 10));
+			if ((target - options.exposure) > 1) options.exposure += 1;
+			else if ((target - options.exposure) < -1) options.exposure -= 1;
+			else options.exposure = target;
 			document.querySelector('#exposure').textContent = options.exposure;
 		}
 		capture_new.updatePixels();
