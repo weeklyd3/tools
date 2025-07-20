@@ -150,12 +150,12 @@
 			var code = ev.code;
 			if (fundamentals[code] && fundamentals[code].ended) {
 				fundamentals[code].ended = false;
-				fundamentals[code].gainChange = options.defaultGainChange * 2;
+				fundamentals[code].gainChange = options.defaultGainChange * 5;
 			}
 			if (fundamentals[code]) return;
 			for (const array of notes) {
 				for (const note of array) {
-					if (note.key == code) fundamentals[code] = {frequency: note.frequency * 2 ** (options.offset / 12), oscillators: [], gain: 0, gainChange: options.defaultGainChange * 2, ended: false};
+					if (note.key == code) fundamentals[code] = {frequency: note.frequency * 2 ** (options.offset / 12), oscillators: [], gain: 0, gainChange: options.defaultGainChange * 5, ended: false};
 				}
 			}
 			if (!fundamentals[code]) return;
