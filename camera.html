@@ -57,7 +57,7 @@
 		onclick="options.zoom = Math.max(options.min_zoom, options.zoom + 1); document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">++</button>
 	<br />
 	<label>
-		<input type="checkbox" onchange="options.auto_exposure = this.checked;" checked="checked" />
+		<input type="checkbox" onchange="options.auto_exposure = this.checked;" />
 		Auto Exposure
 	</label>
 	<label>
@@ -126,6 +126,7 @@
 		total_average_grayscale /= (3 * capture_new.pixels.length / 4);
 		if (options.auto_exposure) {
 			options.exposure = Math.min(75, Math.max(1, Math.round(10 * options.auto_exposure_target / total_average_grayscale) / 10));
+			document.querySelector('#exposure').value = options.exposure;
 		}
 		capture_new.updatePixels();
 		draw.image(capture_new, (draw.width - capture_new.width * scale) / 2, (draw.height - capture_new.height * scale) / 2, capture_new.width * scale, capture_new.height * scale);
