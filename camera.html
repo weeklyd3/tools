@@ -56,6 +56,14 @@
 	<button class="adjustment"
 		onclick="options.zoom = Math.max(options.min_zoom, options.zoom + 1); document.querySelector('#zoom').textContent = Math.round(10 * options.zoom) / 10;">++</button>
 	<br />
+	<label>
+		<input type="checkbox" onchange="options.auto_exposure = this.checked;" checked="checked" />
+		Auto Exposure
+	</label>
+	<label>
+		<input type="range" min="0" max="1" step="0.01" value="0.5" onchange="options.auto_exposure_target = this.value;" />
+		Target grayscale level (0 = all black, 1 = all white)
+	</label>
 
 </div>
 <script src="p5-1.11.3.min.js"></script>
@@ -96,8 +104,9 @@
 		}
 
 		capture_new.loadPixels();
+		var total_average_grayscale = 0;
 		for (var i = 0; i < capture_new.pixels.length; i += 4) {
-			if (!options.grayscale && options.exposure == 1 && (options.r && options.g && options.b)) break;
+			if (!options.grayscale && options.exposure == 1 && (options.r && options.g && options.b) && (!options.auto_exposure)) break;
 			var pixels = [capture_new.pixels[i], capture_new.pixels[i + 1], capture_new.pixels[i + 2]];
 			if (!options.r) pixels[0] = 0;
 			if (!options.g) pixels[1] = 0;
@@ -112,6 +121,11 @@
 			capture_new.pixels[i + 0] = Math.min(255, pixels[0]);
 			capture_new.pixels[i + 1] = Math.min(255, pixels[1]);
 			capture_new.pixels[i + 2] = Math.min(255, pixels[2]);
+			total_average_grayscale += capture_new.pixels[i + 0] + capture_new.pixels[i + 1] + capture_new.pixels[i + 2];
+		}
+		total_average_grayscale /= (3 * capture_new.pixels.length / 4);
+		if (options.auto_exposure) {
+			options.exposure = Math.min(75, Math.max(1, Math.round(10 * options.auto_exposure_target / total_average_grayscale) / 10));
 		}
 		capture_new.updatePixels();
 		draw.image(capture_new, (draw.width - capture_new.width * scale) / 2, (draw.height - capture_new.height * scale) / 2, capture_new.width * scale, capture_new.height * scale);
@@ -147,7 +161,9 @@
 		p5_zoom: 1,
 		r: true,
 		g: true,
-		b: true
+		b: true,
+		auto_exposure: false,
+		auto_exposure_target: 0.5
 	};
 	var constraints = {
 		width: { ideal: document.querySelector('#width').value },
