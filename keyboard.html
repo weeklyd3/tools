@@ -159,13 +159,15 @@
 				}
 			}
 			if (!fundamentals[code]) return;
-			var actual_overtones = [[1, 1], ...overtones];
+			var actual_overtones = [[1, 1], ...getOvertones(fundamentals[code].frequency)];
 			for (const overtone of actual_overtones) {
 				oscillator = audioCtx.createOscillator();
 				oscillator.type = 'sine';
 				if (overtone[2]) oscillator.type = overtone[2];
 				if (overtone[0] * fundamentals[code].frequency > 6000) continue;
-				oscillator.frequency.setValueAtTime((overtone[0] + (Math.random() - 0.5) * Math.min((overtone[0] - 1) * 0.01, 5 / fundamentals[code].frequency)) * fundamentals[code].frequency, audioCtx.currentTime);
+				if (overtone[0] != 1) var frequency_ratio = overtone[0] + 2 * (Math.random() - 0.5) * 0.00125 * overtone[0];
+				else var frequency_ratio = overtone[0];
+				oscillator.frequency.setValueAtTime(frequency_ratio * fundamentals[code].frequency, audioCtx.currentTime);
 				//oscillator.connect(audioCtx.destination);
 				const gain = audioCtx.createGain();
 				gain.gain.setValueAtTime(overtone[1] * options.volume, audioCtx.currentTime); // 50% volume
@@ -211,7 +213,7 @@
 			[15, 0.12],
 			[16, 0.22]
 		];*/
-		var overtones = [
+		var overtones_high = [
 			[2, 0.8,],// "square"],
 			[3, 0.6],
 			[4, 0.7, "square"],
@@ -223,6 +225,32 @@
 			[10, 0.15, "square"],
 			[11, 0.1]
 		]
+		var overtones_low = [
+			[2, 0.75],
+			[3, 0.6],
+			[4, 0.5],
+			[5, 0.4],
+			[6, 0.35],
+			[7, 0.3],
+			[8, 0.25],
+			[9, 0.20],
+			[10, 0.15]
+		];
+		function getOvertones(frequency) {
+			if (frequency < 200) return overtones_low;
+			if (frequency > 300) return overtones_high;
+			var real_overtones = [];
+			var factor = (frequency - 200) / 300;
+			for (var i = 0; i < overtones_low.length; i++) {
+				var new_low = [...overtones_low[i]];
+				new_low[1] *= (1 - factor);
+				real_overtones.push(new_low);
+				var new_high = [...overtones_high[i]];
+				new_high[1] *= factor;
+				real_overtones.push(new_high);
+			}
+			return real_overtones;
+		}
 		//for (var i = 2; i <= 10; i++) overtones.push([i, 1 / i]);
 		var keysDown = {};
 		var lastKeysDown = {};
