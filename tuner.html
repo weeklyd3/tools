@@ -203,7 +203,7 @@
 			if (options.frequency.target_note) draw.text(`${options.frequency.target_note}${octave}`, 0, -draw.height / 3);
 			else draw.text(`???`, 0, -draw.height / 3);
 			draw.textSize(30);
-			draw.text(`${Math.round(options.frequency.deviation)} cents ${options.frequency.deviation > 0 ? "sharp" : "flat"}`, 0, -draw.height / 3 + 50);
+			draw.text(`${Math.abs(Math.round(options.frequency.deviation))} cents ${options.frequency.deviation > 0 ? "sharp" : "flat"}`, 0, -draw.height / 3 + 50);
 			draw.pop();
 		}
 		function staff_lines(midi, line_addition) {
