@@ -125,8 +125,11 @@
 			draw.strokeWeight(1);
 			historical_pitches.push(Math.log2(raw_pitch) / Math.log2(1500));
 			historical_correlations.push(correlation);
+			var raw_pitch_midi_note = frequency_midi(raw_pitch);
+			historical_deviations.push(raw_pitch_midi_note - Math.round(raw_pitch_midi_note));
 			while (historical_pitches.length > historical_length) historical_pitches.shift();
 			while (historical_correlations.length > historical_length) historical_correlations.shift();
+			while (historical_deviations.length > historical_length) historical_deviations.shift();
 			for (var i = historical_length - historical_pitches.length; i < historical_length - 1; i++) {
 				var index = i - (historical_length - historical_pitches.length);
 				var starting_x = (i / (historical_length) - 0.5) * draw.width;
@@ -136,10 +139,12 @@
 				draw.stroke(draw.color(0, 0, 255, 125));
 				if (historical_correlations[index] < options.sensitivity && historical_correlations[index + 1] < options.sensitivity) continue;
 				draw.line(starting_x, (-historical_pitches[index] + 0.5) * draw.height / 2, finishing_x, (-historical_pitches[index + 1] + 0.5) * draw.height / 2);
+				draw.stroke(draw.color(0, 255, 0, 125));
+				draw.line(starting_x, -historical_deviations[index] * draw.height / 2, finishing_x, -historical_deviations[index + 1] * draw.height / 2);
 			}
 			draw.pop();
 			draw.push();
-			draw.translate(draw.width / 2, draw.height / 2);
+			draw.translate(draw.width / 2, draw.height / 2 - draw.height / 16);
 			draw.strokeWeight(0);
 			draw.fill('#bbbbbb');
 			draw.rect(-draw.width / 2, -draw.height / 16, draw.width, draw.height / 8);
@@ -171,6 +176,7 @@
 		var correlation;
 		var historical_pitches = [];
 		var historical_correlations = [];
+		var historical_deviations = [];
 		var historical_length = 400;
 		var raw_pitch;
 		var bin_number = 4096;
@@ -206,6 +212,9 @@
 		};
 		function midi_frequency(note) {
 			return options.calibration * (2 ** ((note - 69) / 12));
+		}
+		function frequency_midi(frequency) {
+			return 69 + 12 * Math.log2(frequency / options.calibration);
 		}
 		var names = ["C", "Des", "D", "Es", "E", "F", "Ges", "G", "As", "A", "B", "H"];
 		var s = function (sketch) {
