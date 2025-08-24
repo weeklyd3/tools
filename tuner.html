@@ -8,7 +8,9 @@
 <body>
 	<div id="pad" style="text-align: center;"></div>
 	<div style="text-align: right;" id="form">
-		<span id="status">???</span><br /><label>threshold: <input id="threshold" type="number" value="0.2"
+		<span id="status">???</span><br /><label>calibration: <input id="calibration" type="number" value="440"
+				onchange="if (String(this.value.length) > 0) options.calibration = this.value;" /></label>
+		<label>threshold: <input id="threshold" type="number" value="0.2"
 				onchange="if (String(this.value.length) > 0) options.sensitivity = this.value;" /></label>
 		<label>bins: <input id="bins" type="number" value="4096"
 				onchange="if (String(this.value.length) > 0) new_bin_number = this.value;" /></label>
@@ -171,7 +173,104 @@
 			draw.stroke('red');
 			var deviation_x = draw.width / 2 * options.frequency.deviation / 50;
 			draw.line(deviation_x, -draw.height / 16, deviation_x, -draw.height / 160);
+
+			if (options.frequency.midi < 41 || options.frequency.midi > 78) clefs[1] = null;
+			else clefs[1] = 1;
+
+			if (options.frequency.midi > 67 && clefs[0] == 0) clefs[0] = 2;
+			if (options.frequency.midi < 53 && clefs[0] == 2) clefs[0] = 0;
+
+			if (images[clef_names[clefs[0]]]) draw.image(images[clef_names[clefs[0]]], -4 * draw.width / 8, -3 * draw.height / 8, draw.width / 4, draw.width / 4 * 312 / 593);
+			if (images[clef_names[clefs[1]]]) draw.image(images[clef_names[clefs[1]]], 2 * draw.width / 8, -3 * draw.height / 8, draw.width / 4, draw.width / 4 * 312 / 593);
+
+			if (clefs[1]) {
+				draw_note(staff_lines(options.frequency.midi, 1), 2 * draw.width / 8, -3 * draw.height / 8);
+			}
+			if (clefs[0] == 0) {
+				// bass clef
+				draw_note(staff_lines(options.frequency.midi, 3), -4 * draw.width / 8, -3 * draw.height / 8);
+			} else {
+				// treble clef
+				draw_note(staff_lines(options.frequency.midi, -3), -4 * draw.width / 8, -3 * draw.height / 8);
+			}
+
+			draw.fill('black');
+			draw.strokeWeight(0);
+			draw.textSize(12);
+			draw.text("Music drawn using LilyPond fonts", 0, -7 - draw.height / 16);
+			draw.textSize(50);
+			var octave = Math.floor(options.frequency.midi / 12) - 1;
+			if (options.frequency.target_note) draw.text(`${options.frequency.target_note}${octave}`, 0, -draw.height / 3);
+			else draw.text(`???`, 0, -draw.height / 3);
+			draw.textSize(30);
+			draw.text(`${Math.round(options.frequency.deviation)} cents ${options.frequency.deviation > 0 ? "sharp" : "flat"}`, 0, -draw.height / 3 + 50);
 			draw.pop();
+		}
+		function staff_lines(midi, line_addition) {
+			// number of staff lines above middle c
+			var octaves = Math.floor((midi - 60) / 12);
+			var flat = false;
+			var offset = octaves * 3.5;
+			var octave_offset = (midi - 60);
+			while (octave_offset < 0) octave_offset += 12;
+			switch (octave_offset % 12) {
+				case 1: 
+				case 3:
+				case 6: 
+				case 8: 
+				case 10: 
+				flat = true;
+			}
+			switch (octave_offset % 12) {
+				case 0: // c
+				break;
+				case 1:
+				case 2: // d flat OR d
+				offset += 0.5;
+				break;
+				case 3: // e flat
+				case 4: // e
+				offset += 1;
+				break;
+				case 5: // f
+				offset += 1.5;
+				break;
+				case 6: // g flat
+				case 7: // g
+				offset += 2;
+				break;
+				case 8: // a flat
+				case 9: // a
+				offset += 2.5;
+				break;
+				case 10: // b
+				case 11: // h
+				offset += 3;
+				break;
+			}
+			return [offset + line_addition, flat];
+		}
+		function draw_note(note, x, y) {
+			// positive offset is UP on the staff
+			var offset = note[0];
+			var staff_scale = draw.width / 4 / 99.294;
+			var note_y = y - offset * 6.642 * (draw.width / 4 / 99.294);
+			draw.image(images.note, x, note_y, draw.width / 4, draw.width / 4 * 312 / 593);
+			if (note[1]) draw.image(images.flat, x, note_y, draw.width / 4, draw.width / 4 * 312 / 593);
+			if (Math.abs(offset) > 2.5) {
+				draw.stroke('black');
+				for (var i = 3; i <= Math.abs(offset); i++) {
+					var start_x = 58.312 - 3.785;
+					if (i == Math.floor(Math.abs(offset)) && note[1]) {
+						// shorten ledger line
+						start_x = 60.407 - 3.785;
+					}
+					var end_x = 77.859 - 3.785;
+					var line_y = -i * 6.642 * offset / Math.abs(offset) + 52.231 / 2;
+					draw.strokeWeight(2);
+					draw.line(x + staff_scale * start_x, y + staff_scale * line_y, x + staff_scale * end_x, y + staff_scale * line_y);
+				}
+			}
 		}
 		var correlation;
 		var historical_pitches = [];
@@ -217,6 +316,11 @@
 			return 69 + 12 * Math.log2(frequency / options.calibration);
 		}
 		var names = ["C", "Des", "D", "Es", "E", "F", "Ges", "G", "As", "A", "B", "H"];
+		var images = {};
+		var clefs = [0, null];
+		var clef_names = ['bass', 'tenor', 'treble'];
+		// 0 = bass, 1 = tenor, 2 = treble
+		// [left, right]
 		var s = function (sketch) {
 			sketch.setup = async function () {
 				sketch.createCanvas(innerWidth, innerHeight);
@@ -226,6 +330,7 @@
 				draw.colorMode('rgba');
 				draw.textSize(8);
 				draw.textAlign('center', 'center');
+				for (const file of ['tenor', 'bass', 'treble', 'note', 'flat']) images[file] = draw.loadImage(`tuner_svgs/${file}.png`);
 				media = navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false } }).then(function (s) {
 					stream = s;
 					newStream(stream);

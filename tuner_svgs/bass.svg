@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="99.293999"
+   height="52.230999"
+   viewBox="0 0 26.271536 13.819452"
+   version="1.1"
+   id="svg369"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="bass.svg"
+   inkscape:export-filename="bass.png"
+   inkscape:export-xdpi="573.45001"
+   inkscape:export-ydpi="573.45001"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview371"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="4.359103"
+     inkscape:cx="-19.614127"
+     inkscape:cy="-22.596392"
+     inkscape:window-width="2048"
+     inkscape:window-height="1075"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs366" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-25.000034,-58.994802)">
+    <g
+       transform="matrix(1.7572987,0,0,1.7572987,25.000034,69.419229)"
+       id="g74">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0.050000001"
+         y1="0"
+         x2="14.9"
+         y2="0"
+         id="line72" />
+    </g>
+    <g
+       transform="matrix(1.7572987,0,0,1.7572987,25.000034,67.66193)"
+       id="g78">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0.050000001"
+         y1="0"
+         x2="14.9"
+         y2="0"
+         id="line76" />
+    </g>
+    <g
+       transform="matrix(1.7572987,0,0,1.7572987,25.000034,65.904631)"
+       id="g82">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0.050000001"
+         y1="0"
+         x2="14.9"
+         y2="0"
+         id="line80" />
+    </g>
+    <g
+       transform="matrix(1.7572987,0,0,1.7572987,25.000034,64.147332)"
+       id="g86">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0.050000001"
+         y1="0"
+         x2="14.9"
+         y2="0"
+         id="line84" />
+    </g>
+    <g
+       transform="matrix(1.7572987,0,0,1.7572987,25.000034,62.390034)"
+       id="g90">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0.050000001"
+         y1="0"
+         x2="14.9"
+         y2="0"
+         id="line88" />
+    </g>
+    <g
+       transform="matrix(1.7572987,0,0,1.7572987,50.937763,65.904631)"
+       id="g94">
+      <rect
+         x="0"
+         y="-2"
+         width="0.19"
+         height="4"
+         ry="0.0000"
+         fill="currentColor"
+         id="rect92" />
+    </g>
+    <g
+       transform="matrix(1.7572987,0,0,1.7572987,26.405873,64.147332)"
+       id="g98"
+       style="display:inline">
+      <path
+         transform="scale(0.004,-0.004)"
+         d="m 557,-125 c 0,28 23,51 51,51 28,0 51,-23 51,-51 0,-28 -23,-51 -51,-51 -28,0 -51,23 -51,51 z m 0,250 c 0,28 23,51 51,51 28,0 51,-23 51,-51 0,-28 -23,-51 -51,-51 -28,0 -51,23 -51,51 z M 232,263 c 172,0 293,-88 293,-251 0,-263 -263,-414 -516,-521 -3,-3 -6,-4 -9,-4 -7,0 -13,6 -13,13 0,3 1,6 4,9 202,118 412,265 412,493 0,120 -63,235 -171,235 -74,0 -129,-54 -154,-126 11,5 22,8 34,8 C 167,119 212,74 212,19 212,-39 168,-87 112,-87 52,-87 0,-40 0,19 0,152 102,263 232,263 Z"
+         fill="currentColor"
+         id="path96" />
+    </g>
+  </g>
+</svg>
