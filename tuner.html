@@ -8,7 +8,8 @@
 <body>
 	<div id="pad" style="text-align: center;"></div>
 	<div style="text-align: right;" id="form">
-		<span id="status">???</span><br />
+		<span id="status">???</span><br /><label>threshold: <input id="threshold" type="number" value="0.2"
+				onchange="if (String(this.value.length) > 0) options.sensitivity = this.value;" /></label>
 		<label>bins: <input id="bins" type="number" value="4096"
 				onchange="if (String(this.value.length) > 0) new_bin_number = this.value;" /></label>
 		<button
