@@ -134,14 +134,44 @@
 				draw.stroke(draw.color(255, 0, 0, 125));
 				draw.line(starting_x, (-historical_correlations[index] + 0.5) * draw.height / 2, finishing_x, (-historical_correlations[index + 1] + 0.5) * draw.height / 2);
 				draw.stroke(draw.color(0, 0, 255, 125));
+				if (historical_correlations[index] < options.sensitivity && historical_correlations[index + 1] < options.sensitivity) continue;
 				draw.line(starting_x, (-historical_pitches[index] + 0.5) * draw.height / 2, finishing_x, (-historical_pitches[index + 1] + 0.5) * draw.height / 2);
 			}
+			draw.pop();
+			draw.push();
+			draw.translate(draw.width / 2, draw.height / 2);
+			draw.strokeWeight(0);
+			draw.fill('#bbbbbb');
+			draw.rect(-draw.width / 2, -draw.height / 16, draw.width, draw.height / 8);
+			draw.stroke('black');
+			for (var i = -50; i <= 50; i += 1) {
+				var line_x = draw.width / 2 * i / 50;
+				if ((i % 10) == 0) {
+					draw.strokeWeight(3);
+					draw.line(line_x, -draw.height / 16, line_x, -draw.height / 100);
+					draw.line(line_x, draw.height / 16, line_x, draw.height / 100);
+					draw.strokeWeight(0);
+					draw.textSize(20);
+					draw.fill('black');
+					draw.text(i, line_x, 0);
+				} else if ((i % 5) == 0) {
+					draw.strokeWeight(2);
+					draw.line(line_x, -draw.height / 32, line_x, draw.height / 32);
+				} else {
+					draw.strokeWeight(1);
+					draw.line(line_x, -draw.height / 48, line_x, draw.height / 48);
+				}
+			}
+			draw.strokeWeight(5);
+			draw.stroke('red');
+			var deviation_x = draw.width / 2 * options.frequency.deviation / 50;
+			draw.line(deviation_x, -draw.height / 16, deviation_x, -draw.height / 160);
 			draw.pop();
 		}
 		var correlation;
 		var historical_pitches = [];
 		var historical_correlations = [];
-		var historical_length = 150;
+		var historical_length = 400;
 		var raw_pitch;
 		var bin_number = 4096;
 		var new_bin_number = document.querySelector('#bins').value;
