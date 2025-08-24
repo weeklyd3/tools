@@ -69,6 +69,8 @@
 				}
 			}
 			var period = lag / audioCtx.sampleRate;
+			correlation = max_correlation;
+			raw_pitch = 1 / period;
 			//console.log(max_correlation, 1 / period, Math.max(...results), Math.max(...dataArray));
 			if (max_correlation < options.sensitivity) return null;
 			else return 1 / period;
@@ -120,8 +122,27 @@
 			draw.strokeWeight(5);
 			draw.stroke('red');
 			draw.line(0, -draw.height / 4, 0, -draw.height / 30);
+			draw.strokeWeight(1);
+			historical_pitches.push(Math.log2(raw_pitch) / Math.log2(1500));
+			historical_correlations.push(correlation);
+			while (historical_pitches.length > historical_length) historical_pitches.shift();
+			while (historical_correlations.length > historical_length) historical_correlations.shift();
+			for (var i = historical_length - historical_pitches.length; i < historical_length - 1; i++) {
+				var index = i - (historical_length - historical_pitches.length);
+				var starting_x = (i / (historical_length) - 0.5) * draw.width;
+				var finishing_x = ((1 + i) / (historical_length) - 0.5) * draw.width;
+				draw.stroke(draw.color(255, 0, 0, 125));
+				draw.line(starting_x, (-historical_correlations[index] + 0.5) * draw.height / 2, finishing_x, (-historical_correlations[index + 1] + 0.5) * draw.height / 2);
+				draw.stroke(draw.color(0, 0, 255, 125));
+				draw.line(starting_x, (-historical_pitches[index] + 0.5) * draw.height / 2, finishing_x, (-historical_pitches[index + 1] + 0.5) * draw.height / 2);
+			}
 			draw.pop();
 		}
+		var correlation;
+		var historical_pitches = [];
+		var historical_correlations = [];
+		var historical_length = 150;
+		var raw_pitch;
 		var bin_number = 4096;
 		var new_bin_number = document.querySelector('#bins').value;
 		var fft;
@@ -163,7 +184,7 @@
 				draw.angleMode('degrees');
 				draw.frameRate(15);
 				draw.strokeCap('square');
-				draw.colorMode('hsl');
+				draw.colorMode('rgba');
 				draw.textSize(8);
 				draw.textAlign('center', 'center');
 				media = navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false } }).then(function (s) {
