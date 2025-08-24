@@ -1,0 +1,243 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>spectrogram</title>
+</head>
+
+<body>
+	<div id="pad" style="text-align: center;"></div>
+	<div style="text-align: right;" id="form">
+		<span id="status">???</span><br />
+		<label>bins: <input id="bins" type="number" value="4096"
+				onchange="if (String(this.value.length) > 0) new_bin_number = this.value;" /></label>
+		<button
+			onclick="media = navigator.mediaDevices.getUserMedia({ audio: {echoCancellation:false, deviceId: { exact: document.querySelector('#camera').value }} }).then(function(s) { stream = s; newStream(stream); });">Audio
+			View</button>
+		<button onclick="loadDevices();">load devices</button>
+		<label>mic select <select id="camera"></select></label><!--<br />
+	Have headphones? <button onclick="paused = true;">Play</button> <button onclick="paused = false;">Stop</button><br />
+	<label>Volume gain <span id="gain_value">1</span>: <br /><input style="width:95%;" type="range" min="0" max="10" value="1" step="0.01" oninput="gain_input = this.value; document.querySelector('#gain_value').textContent = this.value;" /></label>-->
+
+	</div>
+	<script src="p5-1.11.3.min.js"></script>
+	<script src="p5-sound-1.11.3.min.js"></script>
+	<script>
+		var width_cut = 80;
+		var height_cut = 0;
+		function loadDevices() {
+			navigator.mediaDevices.enumerateDevices().then(function (devices) {
+				document.querySelector('select#camera').innerHTML = '';
+				for (var i = 0; i < devices.length; i++) {
+					var device = devices[i];
+					console.log(device.kind);
+					if (device.kind === 'audioinput') {
+						var option = document.createElement('option');
+						option.value = device.deviceId;
+						console.log(device);
+						option.text = device.label || device.deviceId || 'device ' + (i + 1);
+						document.querySelector('select#camera').appendChild(option);
+					}
+				};
+			});
+		}
+		loadDevices();
+		var samples_to_store = 75;
+		var samples = [];
+		function analyze() {
+			if (!dataArray) return null;
+			analyzer.getFloatTimeDomainData(dataArray);
+			var results = new Float32Array(bufferLength);
+			for (var i = 44; i < bufferLength / 2; i++) {
+				var sum = 0;
+				for (var j = 0; j < (bufferLength - i); j++) {
+					if (dataArray[j + i] == undefined) console.log(j, i);
+					sum += dataArray[j] * dataArray[j + i];
+				}
+				results[i] = sum;
+			}
+			if (results[0] != 0) {
+				for (var i = 1; i < bufferLength / 2; i++) results[i] /= results[0];
+			}
+			var max_correlation = 0;
+			var lag = null;
+			for (var i = 0; i < bufferLength / 2; i++) {
+				if (results[i] > max_correlation) {
+					lag = i;
+					max_correlation = results[i];
+				}
+			}
+			var period = lag / audioCtx.sampleRate;
+			//console.log(max_correlation, 1 / period, Math.max(...results), Math.max(...dataArray));
+			if (max_correlation < options.sensitivity) return null;
+			else return 1 / period;
+		}
+		function update() {
+			//if (paused) gain.gain.value = 0;
+			//else gain.gain.value = gain_input;
+			draw.clear();
+			draw.push();
+			draw.strokeWeight(2);
+			draw.fill('black');
+			if (!analyzer) {
+				document.querySelector('#status').textContent = "No fft object.";
+				return;
+			}
+			options.frequency.set(analyze());
+			document.querySelector('#status').textContent = `Note: ${options.frequency.target_note}`;
+			options.note_width = draw.width / 7;
+			draw.translate(draw.width / 2, draw.height * 3 / 4);
+			draw.fill('lightgray');
+			draw.rect(-draw.width / 2, -draw.height / 4, draw.width, draw.height / 2);
+			draw.fill('darkgray');
+			draw.rect(-draw.width / 2, -draw.height / 24, draw.width, draw.height / 12);
+			draw.stroke('black');
+			draw.push();
+			draw.translate(-options.note_width * (options.frequency.midi_unrounded - options.frequency.midi), 0);
+			draw.textSize(36);
+			for (var i = -6; i <= 6; i++) {
+				draw.push();
+				draw.translate(i * options.note_width, 0);
+				draw.strokeWeight(3);
+				draw.line(0, -draw.height / 4, 0, -draw.height / 24);
+				draw.line(0, draw.height / 4, 0, draw.height / 24);
+				for (var j = 0; j < 10; j++) {
+					draw.strokeWeight(2);
+					draw.line(options.note_width / 10 * j, -draw.height / 24, options.note_width / 10 * j, -draw.height / (i == 4 ? 6 : 8));
+					draw.line(options.note_width / 10 * j, draw.height / 24, options.note_width / 10 * j, draw.height / (i == 4 ? 6 : 8));
+					draw.strokeWeight(1);
+					for (var k = 1; k < 5; k++) {
+						draw.line(options.note_width / 10 * (j + k / 5), -draw.height / 24, options.note_width / 10 * (j + k / 5), -draw.height / 12);
+						draw.line(options.note_width / 10 * (j + k / 5), draw.height / 24, options.note_width / 10 * (j + k / 5), draw.height / 12);
+					}
+				}
+				draw.fill('white');
+				draw.text(`${names[(options.frequency.midi + i) % 12]}\n${Math.round(1000 * midi_frequency(options.frequency.midi + i)) / 1000}`, 0, 0);
+				draw.pop();
+			}
+			draw.pop();
+			draw.strokeWeight(5);
+			draw.stroke('red');
+			draw.line(0, -draw.height / 4, 0, -draw.height / 30);
+			draw.pop();
+		}
+		var bin_number = 4096;
+		var new_bin_number = document.querySelector('#bins').value;
+		var fft;
+		var dataArray;
+		class note {
+			constructor(frequency) {
+				this.frequency = frequency;
+				this.midi = null;
+				this.target = null;
+				this.target_note = null;
+				this.ratio = null;
+				this.deviation = null;
+				this.valid = false;
+				this.set(frequency);
+			}
+			set(frequency) {
+				if (frequency == null) {
+					this.valid = false;
+					return;
+				}
+
+				this.frequency = frequency;
+				this.valid = true;
+				this.midi_unrounded = 69 + 12 * Math.log2(frequency / options.calibration);
+				this.midi = Math.round(this.midi_unrounded);
+				this.target = options.calibration * (2 ** ((this.midi - 69) / 12));
+				this.target_note = names[this.midi % 12];
+				this.ratio = frequency / this.target;
+				this.deviation = 1200 * Math.log2(this.ratio);
+			}
+		};
+		function midi_frequency(note) {
+			return options.calibration * (2 ** ((note - 69) / 12));
+		}
+		var names = ["C", "Des", "D", "Es", "E", "F", "Ges", "G", "As", "A", "B", "H"];
+		var s = function (sketch) {
+			sketch.setup = async function () {
+				sketch.createCanvas(innerWidth, innerHeight);
+				draw.angleMode('degrees');
+				draw.frameRate(15);
+				draw.strokeCap('square');
+				draw.colorMode('hsl');
+				draw.textSize(8);
+				draw.textAlign('center', 'center');
+				media = navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false } }).then(function (s) {
+					stream = s;
+					newStream(stream);
+				});
+				capture_new = null;
+				resize(null);
+			};
+			sketch.draw = update;
+		}
+
+		var bar_height = 20;
+		var stream = null;
+		var track = null;
+		var form = document.querySelector('#form');
+		var options = {
+			oboe_done: 0,
+			oboe: 0,
+			oboe_frequency: new note(null),
+			frequency: new note(null),
+			calibration: 440,
+			sensitivity: 0.2
+		};
+		var analyzer = null;
+		var media;
+		const audioCtx = new AudioContext();
+		var paused = true;
+
+		//const gain = audioCtx.createGain();
+		//gain.gain.value = 2.0;
+
+		//gain.connect(audioCtx.destination);
+		var track;
+		//gain.gain.value = 0;
+		var gain_input = 1;
+
+		function newStream(stream) {
+			bin_number = new_bin_number;
+			analyzer = audioCtx.createAnalyser();
+			source = audioCtx.createMediaStreamSource(stream);
+			source.connect(analyzer);
+			analyzer.fftSize = bin_number;
+			bufferLength = analyzer.frequencyBinCount;
+			dataArray = new Float32Array(bufferLength);
+			//source.connect(gain);
+			return;
+		}
+		resize = function (ev) {
+			bar_height = innerHeight - (form.getBoundingClientRect().y);
+			draw.resizeCanvas(innerWidth, innerHeight); // - bar_height);
+		};
+		onerror = function (error) {
+			var message = `${error}`;
+			alert(message);
+		};
+		//onresize = resize;
+
+		var draw = new p5(s, 'pad');
+	</script>
+	<style>
+		video {
+			display: none;
+		}
+
+		body,
+		html {
+			padding: 0;
+			margin: 0;
+		}
+
+		button.adjustment {
+			font-size: 25px;
+		}
+	</style>
+</body>
+
+</html>
