@@ -79,8 +79,8 @@
 			[
 				{ "key": "Backquote", "note": "Gis3" },
 				{ "key": "Tab", "note": "A3" },
-				{ "key": "Digit1", "note": "Ais3" },
-				{ "key": "KeyQ", "note": "B3" },
+				{ "key": "Digit1", "note": "B3" },
+				{ "key": "KeyQ", "note": "H3" },
 				{ "key": "KeyW", "note": "C4" },
 				{ "key": "Digit3", "note": "Cis4" },
 				{ "key": "KeyE", "note": "D4" },
@@ -91,8 +91,8 @@
 				{ "key": "KeyY", "note": "G4" },
 				{ "key": "Digit7", "note": "Gis4" },
 				{ "key": "KeyU", "note": "A4" },
-				{ "key": "Digit8", "note": "Ais4" },
-				{ "key": "KeyI", "note": "B4" },
+				{ "key": "Digit8", "note": "B4" },
+				{ "key": "KeyI", "note": "H4" },
 				{ "key": "KeyO", "note": "C5" },
 				{ "key": "Digit0", "note": "Cis5" },
 				{ "key": "KeyP", "note": "D5" },
@@ -104,7 +104,7 @@
 			],
 			// second row
 			[
-				{ "key": "CapsLock", "note": "B1" },
+				{ "key": "CapsLock", "note": "H1" },
 				{ "key": "ShiftLeft", "note": "C2" },
 				{ "key": "KeyA", "note": "Cis2" },
 				{ "key": "KeyZ", "note": "D2" },
@@ -115,8 +115,8 @@
 				{ "key": "KeyV", "note": "G2" },
 				{ "key": "KeyG", "note": "Gis2" },
 				{ "key": "KeyB", "note": "A2" },
-				{ "key": "KeyH", "note": "Ais2" },
-				{ "key": "KeyN", "note": "B2" },
+				{ "key": "KeyH", "note": "B2" },
+				{ "key": "KeyN", "note": "H2" },
 				{ "key": "KeyM", "note": "C3" },
 				{ "key": "KeyK", "note": "Cis3" },
 				{ "key": "Comma", "note": "D3" },
@@ -137,7 +137,7 @@
 					if ('1234567890'.indexOf(char) != -1) note.octave += char;
 					else note.letter += char;
 				}
-				note.number = ["C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "Ais", "B"].indexOf(note.letter);
+				note.number = ["C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "B", "H"].indexOf(note.letter);
 				note.frequency = 440 / (2 ** (9 / 12)) * (2 ** (note.octave - 4)) * (2 ** (note.number / 12));
 			}
 		}
