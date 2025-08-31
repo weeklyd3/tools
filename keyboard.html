@@ -28,7 +28,7 @@
 			draw.push();
 			var white_keys = 0;
 			for (const key of keys) {
-				if (key.note.indexOf('is') == -1) white_keys++;
+				if (key.note.indexOf('is') == -1 && key.note[0] != "B") white_keys++;
 			}
 			var key_width = width * 0.9 / white_keys;
 			var white_key_index = 0;
@@ -37,7 +37,7 @@
 			draw.strokeWeight(2);
 			for (const key of keys) {
 				var x = -key_width * (white_keys / 2 - white_key_index);
-				if (key.note.indexOf('is') == -1) {
+				if (key.note.indexOf('is') == -1 && key.note[0] != "B") {
 					draw.fill('white');
 					if (fundamentals[key.key] && !fundamentals[key.key].ended) draw.fill('red');
 					draw.rect(x, -height / 2, key_width, height);
@@ -46,12 +46,12 @@
 					//draw.rect(x - key_width / 4, -height / 2, key_width / 2, height * 0.6);
 				}
 
-				if (key.note.indexOf('is') == -1) white_key_index++;
+				if (key.note.indexOf('is') == -1 && key.note[0] != "B") white_key_index++;
 			}
 			var white_key_index = 0;
 			for (const key of keys) {
 				var x = -key_width * (white_keys / 2 - white_key_index);
-				if (key.note.indexOf('is') == -1) {
+				if (key.note.indexOf('is') == -1 && key.note[0] != "B") {
 					//draw.fill(draw.color(0, 0, 0, 0));
 					//draw.rect(x, -height / 2, key_width, height);
 				} else {
@@ -59,17 +59,17 @@
 					if (fundamentals[key.key]) draw.fill('red');
 					draw.rect(x - key_width / 3, -height / 2, key_width / 1.5, height * 0.6);
 				}
-				if (key.note.indexOf('is') == -1) white_key_index++;
+				if (key.note.indexOf('is') == -1 && key.note[0] != "B") white_key_index++;
 			}
 			var white_key_index = 0;
 			draw.strokeWeight(0);
 			for (const key of keys) {
 				draw.fill('white');
 				var x = -key_width * (white_keys / 2 - white_key_index);
-				if (key.note.indexOf('is') == -1) white_key_index++;
-				if (key.note.indexOf('is') == -1) draw.fill('black');
-				var textX = (key.note.indexOf('is') == -1) ? (x + key_width / 2) : (x);
-				var textY = (key.note.indexOf('is') == -1) ? (height * 0.4) : (-height * 0.4);
+				if (key.note.indexOf('is') == -1 && key.note[0] != "B") white_key_index++;
+				if (key.note.indexOf('is') == -1 && key.note[0] != "B") draw.fill('black');
+				var textX = (key.note.indexOf('is') == -1 && key.note[0] != "B") ? (x + key_width / 2) : (x);
+				var textY = (key.note.indexOf('is') == -1 && key.note[0] != "B") ? (height * 0.4) : (-height * 0.4);
 				draw.text(key.note + "\n" + key.key, textX, textY);
 			}
 			draw.pop();
